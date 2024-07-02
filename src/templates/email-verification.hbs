@@ -1,0 +1,39 @@
+<html lang='en'>
+	<head>
+		<meta charset='UTF-8' />
+		<title>Email verification</title>
+		<style>
+			/* Styling */ body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color:
+			#fffeff; /* Secondary color */ } .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px
+			solid #ddd; border-radius: 5px; background-color: #fff; /* Main color */ } h1 { color: #23b3c0; /* Primary color
+			*/ text-align: left; display: flex; align-items: center; } h1 img { margin-right: 10px; max-width: 50px; height:
+			auto; } p { color: #555; text-align: left; } .cta-button { display: block; width: 200px; margin: 20px auto;
+			padding: 10px; text-align: center; background-color: #007bff; color: #ffffff !important; text-decoration: none;
+			border-radius: 5px; } .cta-button:hover { color: #ffffff; background-color: #0056b3; }
+		</style>
+	</head>
+	<body>
+		<div class='container'>
+			<h1>Email Verification</h1>
+			<p>Dear {{username}},</p>
+			<p>
+				Thank you for registering with our service. To complete your registration and verify your email address, please
+				follow the steps below:
+			</p>
+			<ol>
+				<li>Open the email verification page using the link below:</li>
+			</ol>
+			<a class='cta-button' href='{{link}}'>Verify Email</a>
+			<p>
+				If you didn't initiate this request or do not wish to verify your email, you may ignore this message. However,
+				we recommend verifying your email to take full advantage of our services.
+			</p>
+			<p>Thank you for your attention.</p>
+			<p>
+				Best regards,
+				<br />
+				{{greeter}}
+			</p>
+		</div>
+	</body>
+</html>

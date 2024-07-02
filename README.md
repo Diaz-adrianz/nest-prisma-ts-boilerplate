@@ -1,38 +1,37 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## Nest Prisma TS Boilerplate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A ready to go boilerplate for starting Backend Development project with NestJS. Focused on Simplifies the development process, enhancing efficiency and maintainability. Ensures comprehensive coverage of fundamental and common needs. Continuously striving to stay updated.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Todos
 
-## Description
+- [x] Redis integration
+- [x] JWT Auth flow management
+- [ ] Feature access management
+- [ ] Upload file with multer
+- [ ] Winston logger integration
+- [ ] Jest utilization
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Run Locally
 
-## Installation
+Clone the project
+
+```bash
+$ git clone < repository link >
+```
+
+Go to the project directory
+
+```bash
+$ cd nest-prisma-ts-boilerplate
+```
+
+Install dependencies
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+Run at port 3000
 
 ```bash
 # development
@@ -45,29 +44,53 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## Tech Stack
 
-```bash
-# unit tests
-$ npm run test
+- [NestJS 10](https://nestjs.com/)
+- [Redis](https://redis.io/)
+- [Nodemailer](https://www.nodemailer.com/)
+- [Handlebars](https://handlebarsjs.com/)
+- [Multer](https://www.npmjs.com/package/multer)
+- [Winston logger](https://github.com/winstonjs/winston)
+- [Passport](https://www.passportjs.org/)
+- [JsonWebToken](https://jwt.io/)
 
-# e2e tests
-$ npm run test:e2e
+## Project Structure
 
-# test coverage
-$ npm run test:cov
+```sh
+prisma
+├── migrations                    # Database migrations
+├── seeder                        # Database seeder
+└── schema.prisma                 # Prisma schema
+src
+├── config                        # setting and constant value
+├── core                          # features' resources
+  ├── auth
+    ├── guards                    # Auth protection (jwt check and feature access check)
+    └── strategies                # Passport auth
+  └── < feature >                 # Another features
+├── filters                       # Global Error handling
+  ├── http-exception.filter.ts    # HttpException class error handling
+  └── prisma-exception.filter.ts  # PrismaClientKnownRequest class error handling
+├── helper
+  ├── decorator                   # Reusable and common decorators
+  └── dto                         # Reusable and common dto
+├── lib                           # third party and separated modules/services
+├── templates                     # static html/hbs e.g for email templating
+├── types                         # Typescript data type definition
+├── utils                         # Utility functions
+└── main.ts                       # project entry point
+test
 ```
 
-## Support
+## Authors
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- [@Diaz-Adrianz](https://github.com/Diaz-adrianz)
 
-## Stay in touch
+## Feedback
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+If you have any feedback, please reach out me at [email](mailto:diazz.developer@gmail.com)
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)

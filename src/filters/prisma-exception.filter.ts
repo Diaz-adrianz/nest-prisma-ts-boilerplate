@@ -1,6 +1,7 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
+import { settings } from 'src/config';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
@@ -8,8 +9,9 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
 
-		let status = HttpStatus.INTERNAL_SERVER_ERROR;
-		let message = 'Internal server error';
+		let status = HttpStatus.INTERNAL_SERVER_ERROR,
+			message = 'Internal server error';
+		const stack = exception.stack;
 
 		if (exception.code === 'P2002') {
 			status = HttpStatus.CONFLICT;
@@ -22,6 +24,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 		response.status(status).json({
 			statusCode: status,
 			message,
+			stack: settings.isDev() ? stack : undefined,
 		});
 	}
 }

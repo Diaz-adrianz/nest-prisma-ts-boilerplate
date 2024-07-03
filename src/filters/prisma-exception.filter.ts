@@ -2,9 +2,12 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/commo
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
 import { settings } from 'src/config';
+import { LoggerService } from 'src/lib/logger/logger.service';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
+	constructor(private readonly logger: LoggerService) {}
+
 	catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
@@ -20,6 +23,8 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 			status = HttpStatus.NOT_FOUND;
 			message = `${exception.meta?.modelName ?? 'Data'} not found`;
 		}
+
+		if (!settings.isDev()) this.logger.error(exception);
 
 		response.status(status).json({
 			statusCode: status,

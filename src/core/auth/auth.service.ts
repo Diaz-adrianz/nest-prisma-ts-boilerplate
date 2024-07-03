@@ -16,6 +16,7 @@ import { TjwtPayload, TuserAuth } from 'src/types';
 import { RedisService } from 'src/lib/redis/redis.service';
 import { RegisterDto } from './dto/register.dto';
 import { MailerService } from 'src/lib/mailer/mailer.service';
+import { LoggerService } from 'src/lib/logger/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
 		private tokenize: TokenizeService,
 		private client: ClientService,
 		private mailer: MailerService,
+		private logger: LoggerService,
 	) {}
 
 	async register(payload: RegisterDto) {
@@ -46,8 +48,7 @@ export class AuthService {
 			// send verification to email inbox
 			await this.mailer.sendEmailVerification(payload.username, payload.email, link);
 		} catch (error) {
-			// TODO store error in logger
-			console.log('send email verification error', error);
+			this.logger.error(error);
 		}
 	}
 
@@ -122,7 +123,7 @@ export class AuthService {
 			return { at };
 		} catch (error) {
 			// TODO catch another errors
-			// TODO store error in logger
+			this.logger.error(error);
 			throw new UnauthorizedException('Access denied');
 		}
 	}

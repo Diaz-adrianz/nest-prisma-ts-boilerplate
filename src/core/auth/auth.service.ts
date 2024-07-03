@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	ForbiddenException,
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/lib/prisma/prisma.service';
 import { TokenizeService } from 'src/lib/tokenize/tokenize.service';
 import { LoginDto } from './dto/login.dto';
@@ -48,17 +55,17 @@ export class AuthService {
 		const user = await this.prisma.user.findUnique({ where: { username: payload.username } });
 
 		// user must exist
-		if (!user) throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
+		if (!user) throw new NotFoundException('Account not found');
 
 		// user email must be verified
-		if (!user.is_email_verified) throw new HttpException('Email not verified yet', HttpStatus.FORBIDDEN);
+		if (!user.is_email_verified) throw new ForbiddenException('Email not verified yet');
 
 		// user must active
-		if (!user.is_active) throw new HttpException('Account is currently inactive', HttpStatus.FORBIDDEN);
+		if (!user.is_active) throw new ForbiddenException('Account is currently inactive');
 
 		// password must be match
 		if (!(await this.tokenize.bcryptCompare(payload.password, user.password)))
-			throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
+			throw new BadRequestException('Wrong password');
 
 		// generate session id
 		const sessionId = genRandomString(24);
@@ -86,13 +93,13 @@ export class AuthService {
 			await this.redis.cl.del(`access:${sessionId}`);
 			await this.redis.cl.del(`refresh:${sessionId}`);
 		} catch (error) {
-			throw new HttpException('Failed to logout', HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new InternalServerErrorException('Failed to logout');
 		}
 	}
 
 	async refreshToken() {
 		const refreshToken = this.client.getRefreshToken();
-		if (!refreshToken) throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
+		if (!refreshToken) throw new UnauthorizedException('Access denied');
 
 		try {
 			// verify signature refresh token
@@ -116,7 +123,7 @@ export class AuthService {
 		} catch (error) {
 			// TODO catch another errors
 			// TODO store error in logger
-			throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
+			throw new UnauthorizedException('Access denied');
 		}
 	}
 
@@ -127,7 +134,7 @@ export class AuthService {
 
 			// user must not be verified yet
 			const checkUser = await this.prisma.user.count({ where: { id: payload.uid, is_email_verified: true } });
-			if (checkUser) throw new HttpException("Account's email has been verified", HttpStatus.BAD_REQUEST);
+			if (checkUser) throw new BadRequestException("Account's email has been verified");
 
 			// set email verified and active
 			await this.prisma.user.update({
@@ -139,9 +146,8 @@ export class AuthService {
 			});
 		} catch (error) {
 			// access token related errors
-			if (error?.message == 'jwt must be provided')
-				throw new HttpException('Access not provided', HttpStatus.BAD_REQUEST);
-			if (error?.message == 'invalid signature') throw new HttpException('Invalid access', HttpStatus.BAD_REQUEST);
+			if (error?.message == 'jwt must be provided') throw new BadRequestException('Access not provided');
+			if (error?.message == 'invalid signature') throw new BadRequestException('Invalid access');
 
 			throw error;
 		}

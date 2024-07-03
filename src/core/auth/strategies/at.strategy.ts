@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TjwtPayload } from 'src/types';
@@ -15,7 +15,7 @@ export class AtStrategy extends PassportStrategy(Strategy, 'at') {
 
 	async validate(payload: TjwtPayload) {
 		const user = await this.redis.cl.get(`access:${payload.sid}`);
-		if (!user) throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
+		if (!user) throw new UnauthorizedException('Access denied');
 
 		return { sessionId: payload.sid, user: JSON.parse(user) };
 	}

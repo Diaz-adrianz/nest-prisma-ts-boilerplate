@@ -1,4 +1,4 @@
-import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
@@ -28,7 +28,7 @@ export class JwtAuthGuard extends AuthGuard('at') {
 			if (info?.name == 'TokenExpiredError') message = 'Access expired';
 			else if (info?.message == 'No auth token') message = 'Access is not provided';
 
-			throw new HttpException(message, HttpStatus.UNAUTHORIZED);
+			throw new UnauthorizedException(message);
 		}
 
 		return user;

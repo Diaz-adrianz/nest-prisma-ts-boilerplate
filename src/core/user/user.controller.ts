@@ -4,10 +4,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BrowseDto } from 'src/helper/dto/browse.dto';
 import { paginateResponse, successResponse } from 'src/helper/response.helper';
+import { ClientService } from 'src/lib/client/client.service';
 
 @Controller('user')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(
+		private readonly userService: UserService,
+		private readonly client: ClientService,
+	) {}
 
 	@Post('create')
 	async create(@Body() createUserDto: CreateUserDto) {
@@ -48,4 +52,14 @@ export class UserController {
 		const data = await this.userService.restore(ids.split(','));
 		return successResponse(null, `${data.count ? data.count + ' roles' : 'Role'} restored successfully`);
 	}
+
+	@Get('me')
+	async findMyProfile() {
+		const { id } = this.client.getUser();
+		const data = await this.userService.findOne(id);
+		return successResponse(data, 'User retrieved successfully');
+	}
+
+	@Get('me/update-photo')
+	async updatePhoto() {}
 }

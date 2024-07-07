@@ -8,7 +8,7 @@ A ready to go boilerplate for starting Backend Development project with NestJS. 
 - [x] JWT Auth flow management
 - [x] Send email with nodemailer
 - [ ] Feature access management
-- [ ] Upload file with multer
+- [x] Upload file with multer
 - [x] Winston logger integration
 - [ ] Jest utilization
 

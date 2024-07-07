@@ -27,14 +27,14 @@ export interface IvalidateOptions {
 }
 
 export function fileValidator(file: Express.Multer.File, options: IvalidateOptions) {
-	let allowedMimes = [];
+	let allowedExts = [];
 
-	if (options.exts) allowedMimes = [...allowedMimes, ...options.exts];
-	if (options.fileType) options.fileType.forEach((typ) => allowedMimes.push(...fileExtensions[typ]));
+	if (options.exts) allowedExts = [...allowedExts, ...options.exts];
+	if (options.fileType) options.fileType.forEach((typ) => allowedExts.push(...fileExtensions[typ]));
 
-	if (!allowedMimes.includes(file.mimetype))
+	if (!allowedExts.includes(file.mimetype))
 		throw new BadRequestException(
-			`Invalid file type for '${file.fieldname}'. Please upload only in ${allowedMimes.map((mim) => mim.split('/')[1]).join(', ')} format.`,
+			`Invalid file type for '${file.fieldname}'. Please upload only in ${allowedExts.map((ext) => ext.split('/')[1]).join(', ')} format.`,
 		);
 
 	if (file.size > options.maxSize)

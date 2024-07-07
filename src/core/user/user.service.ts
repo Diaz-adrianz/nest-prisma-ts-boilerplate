@@ -6,6 +6,7 @@ import { TokenizeService } from 'src/lib/tokenize/tokenize.service';
 import { BrowseDto } from 'src/helper/dto/browse.dto';
 import { excludePrismaSelect, toPrismQuery, toPrismSelect } from 'src/utils';
 import { DaoService } from 'src/lib/dao/dao.service';
+import { UploaderService } from '../uploader/uploader.service';
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
 		private tokenize: TokenizeService,
 		private prisma: PrismaService,
 		private dao: DaoService,
+		private uploaderService: UploaderService,
 	) {}
 
 	async create(payload: CreateUserDto) {
@@ -53,7 +55,7 @@ export class UserService {
 	async findOne(id: string) {
 		const result = await this.prisma.user.findUnique({ where: { id } });
 		if (!result) throw new NotFoundException('User not found');
-		return excludePrismaSelect(result, ['password']);
+		return excludePrismaSelect<typeof result>(result, ['password']);
 	}
 
 	async update(id: string, payload: UpdateUserDto) {
@@ -91,13 +93,18 @@ export class UserService {
 		return result;
 	}
 
-	async updatePhoto(id: string, path: string) {
+	async updatePhoto(id: string, file: Express.Multer.File) {
+		const user = await this.findOne(id);
+		if (user.path_photo) this.uploaderService.deleteFromDisk(user.path_photo);
+
+		const photo = this.uploaderService.saveToDisk(file, '/pfp');
 		const result = await this.prisma.user.update({
 			where: { id },
 			data: {
-				path_photo: path,
+				path_photo: photo.path,
 			},
 		});
+
 		return result;
 	}
 }

@@ -7,9 +7,10 @@ import { JwtAuthGuard } from './core/auth/guards/jwt-auth.guard';
 import { LoggerModule } from './lib/logger/logger.module';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { PrismaExceptionFilter } from './filters/prisma-exception.filter';
+import { UploaderModule } from './core/uploader/uploader.module';
 
 @Module({
-	imports: [UserModule, RoleModule, AuthModule, LoggerModule],
+	imports: [UserModule, RoleModule, AuthModule, UploaderModule, LoggerModule],
 	controllers: [],
 	providers: [
 		{

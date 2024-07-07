@@ -19,7 +19,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { BrowseDto } from 'src/helper/dto/browse.dto';
 import { paginateResponse, successResponse } from 'src/helper/response.helper';
 import { ClientService } from 'src/lib/client/client.service';
-import { UploaderService } from '../uploader/uploader.service';
 import { UploaderInterceptor } from '../uploader/uploader.interceptor';
 
 @Controller('user')
@@ -27,7 +26,6 @@ export class UserController {
 	constructor(
 		private readonly userService: UserService,
 		private readonly client: ClientService,
-		private readonly uploadService: UploaderService,
 	) {}
 
 	@Post('create')
@@ -81,9 +79,7 @@ export class UserController {
 	@UseInterceptors(new UploaderInterceptor([{ name: 'photo', maxSize: 3 * 1000 * 1000, fileType: ['image'] }]))
 	async updatePhoto(@UploadedFiles() files: { photo?: Express.Multer.File }) {
 		const { id } = this.client.getUser();
-		const uploadedPhoto = this.uploadService.saveToDisk(files.photo, '/pfp');
-
-		this.userService.updatePhoto(id, uploadedPhoto.path);
+		this.userService.updatePhoto(id, files.photo);
 		return successResponse(null, 'New profile photo saved');
 	}
 }

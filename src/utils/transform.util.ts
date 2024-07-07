@@ -143,7 +143,7 @@ export function toPrismSelect(include: string[], exclude?: string[]) {
 	return Object.keys(select).length === 0 ? undefined : select;
 }
 
-export function excludePrismaSelect(result: any | any[], fields: string[]) {
+export function excludePrismaSelect<T>(result: any | any[], fields: string[]): T {
 	if (Array.isArray(result)) {
 		result.forEach((r) => {
 			fields.forEach((f) => delete r[f]);

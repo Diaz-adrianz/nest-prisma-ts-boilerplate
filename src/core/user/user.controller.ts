@@ -1,16 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, Query } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Patch,
+	Param,
+	Delete,
+	Query,
+	UploadedFile,
+	Put,
+	UseInterceptors,
+	Req,
+	UploadedFiles,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BrowseDto } from 'src/helper/dto/browse.dto';
 import { paginateResponse, successResponse } from 'src/helper/response.helper';
 import { ClientService } from 'src/lib/client/client.service';
+import { UploaderService } from '../uploader/uploader.service';
+import { UploaderInterceptor } from '../uploader/uploader.interceptor';
 
 @Controller('user')
 export class UserController {
 	constructor(
 		private readonly userService: UserService,
 		private readonly client: ClientService,
+		private readonly uploadService: UploaderService,
 	) {}
 
 	@Post('create')
@@ -60,6 +77,13 @@ export class UserController {
 		return successResponse(data, 'User retrieved successfully');
 	}
 
-	@Get('me/update-photo')
-	async updatePhoto() {}
+	@Put('me/update-photo')
+	@UseInterceptors(new UploaderInterceptor([{ name: 'photo', maxSize: 3 * 1000 * 1000, fileType: ['image'] }]))
+	async updatePhoto(@UploadedFiles() files: { photo?: Express.Multer.File }) {
+		const { id } = this.client.getUser();
+		const uploadedPhoto = this.uploadService.saveToDisk(files.photo, '/pfp');
+
+		this.userService.updatePhoto(id, uploadedPhoto.path);
+		return successResponse(null, 'New profile photo saved');
+	}
 }

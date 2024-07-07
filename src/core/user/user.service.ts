@@ -90,4 +90,14 @@ export class UserService {
 		else result = await this.dao.restoreMany('User', ids);
 		return result;
 	}
+
+	async updatePhoto(id: string, path: string) {
+		const result = await this.prisma.user.update({
+			where: { id },
+			data: {
+				path_photo: path,
+			},
+		});
+		return result;
+	}
 }

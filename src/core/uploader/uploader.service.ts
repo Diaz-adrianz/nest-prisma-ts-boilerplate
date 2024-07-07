@@ -1,52 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-
-export type TfileExtensions =
-	| 'application/pdf'
-	| 'application/msword'
-	| 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-	| 'image/jpeg'
-	| 'image/jpg'
-	| 'image/png'
-	| 'video/mp4'
-	| 'video/webm';
-
-export const fileExtensions = {
-	image: ['image/jpeg', 'image/jpg', 'image/png'] as TfileExtensions[],
-	video: ['video/mp4', 'video/webm'] as TfileExtensions[],
-	file: [
-		'application/pdf',
-		'application/msword',
-		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-	] as TfileExtensions[],
-};
-
-export interface IvalidateOptions {
-	exts?: TfileExtensions[];
-	fileType?: ('image' | 'video' | 'file')[];
-	maxSize: number;
-}
+import { LoggerService } from 'src/lib/logger/logger.service';
+import { fileValidator, IvalidateOptions } from './helper/file-validator.helper';
 
 @Injectable()
 export class UploaderService {
-	constructor() {}
+	constructor(private logger?: LoggerService) {}
 
 	validate(file: Express.Multer.File, options: IvalidateOptions) {
-		let allowedMimes = [];
-
-		if (options.exts) allowedMimes = [...allowedMimes, ...options.exts];
-		if (options.fileType) options.fileType.forEach((typ) => allowedMimes.push(...fileExtensions[typ]));
-
-		if (!allowedMimes.includes(file.mimetype))
-			throw new BadRequestException(
-				`Invalid file type for '${file.fieldname}'. Please upload only in ${allowedMimes.map((mim) => mim.split('/')[1]).join(', ')} format.`,
-			);
-
-		if (file.size > options.maxSize)
-			throw new BadRequestException(
-				`The '${file.fieldname}' exceeds the maximum allowed size of ${(options.maxSize / 1000 / 1000).toFixed(2)}MB`,
-			);
+		return fileValidator(file, options);
 	}
 
 	editFileName(originalName: string, feature?: string) {
@@ -77,5 +40,11 @@ export class UploaderService {
 			path: filePath,
 			size: file.size,
 		};
+	}
+
+	deleteFromDisk(path: string) {
+		fs.unlink(path, (err) => {
+			if (err) this.logger.error(err);
+		});
 	}
 }

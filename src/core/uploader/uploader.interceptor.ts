@@ -1,7 +1,7 @@
-import { BadRequestException, CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import * as multer from 'multer';
 import { Observable } from 'rxjs';
-import { TfileExtensions, UploaderService } from './uploader.service';
+import { fileValidator, TfileExtensions } from './helper/file-validator.helper';
 
 interface IuploadField {
 	name: string;
@@ -13,11 +13,7 @@ interface IuploadField {
 
 @Injectable()
 export class UploaderInterceptor implements NestInterceptor {
-	private uploaderService: UploaderService;
-
-	constructor(private readonly fields: IuploadField[]) {
-		this.uploaderService = new UploaderService();
-	}
+	constructor(private readonly fields: IuploadField[]) {}
 
 	async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
 		const ctx = context.switchToHttp();
@@ -30,7 +26,7 @@ export class UploaderInterceptor implements NestInterceptor {
 				const field = this.fields.find((v) => v.name === file.fieldname);
 
 				try {
-					this.uploaderService.validate(file, { exts: field.exts, fileType: field.fileType, maxSize: field.maxSize });
+					fileValidator(file, { exts: field.exts, fileType: field.fileType, maxSize: field.maxSize });
 					cb(null, true);
 				} catch (error) {
 					cb(error, false);
@@ -45,7 +41,7 @@ export class UploaderInterceptor implements NestInterceptor {
 
 		await new Promise((resolve, reject) => {
 			multerInstance(request, response, async (err: any) => {
-				if (err) reject(err);
+				if (err) return reject(err);
 
 				this.fields.forEach((field) => {
 					if (!field.maxCount || field.maxCount == 1) {
@@ -53,7 +49,7 @@ export class UploaderInterceptor implements NestInterceptor {
 					}
 				});
 
-				resolve(true);
+				return resolve(true);
 			});
 		});
 
